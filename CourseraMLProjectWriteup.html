@@ -1,0 +1,158 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:w="urn:schemas-microsoft-com:office:word"
+xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=ProgId content=Word.Document>
+<meta name=Generator content="Microsoft Word 10">
+<meta name=Originator content="Microsoft Word 10">
+<link rel=File-List href="CourseraMLProjectWriteup_files/filelist.xml">
+<title>Coursera Practical Machine Learning Final Project</title>
+<!--[if gte mso 9]><xml>
+ <o:DocumentProperties>
+  <o:Author>JaneneSilvers</o:Author>
+  <o:Template>Normal</o:Template>
+  <o:LastAuthor>JaneneSilvers</o:LastAuthor>
+  <o:Revision>2</o:Revision>
+  <o:TotalTime>148</o:TotalTime>
+  <o:Created>2014-08-23T17:22:00Z</o:Created>
+  <o:LastSaved>2014-08-23T17:22:00Z</o:LastSaved>
+  <o:Pages>1</o:Pages>
+  <o:Words>461</o:Words>
+  <o:Characters>2630</o:Characters>
+  <o:Lines>21</o:Lines>
+  <o:Paragraphs>6</o:Paragraphs>
+  <o:CharactersWithSpaces>3085</o:CharactersWithSpaces>
+  <o:Version>10.6870</o:Version>
+ </o:DocumentProperties>
+</xml><![endif]--><!--[if gte mso 9]><xml>
+ <w:WordDocument>
+  <w:GrammarState>Clean</w:GrammarState>
+  <w:Compatibility>
+   <w:BreakWrappedTables/>
+   <w:SnapToGridInCell/>
+   <w:WrapTextWithPunct/>
+   <w:UseAsianBreakRules/>
+  </w:Compatibility>
+  <w:BrowserLevel>MicrosoftInternetExplorer4</w:BrowserLevel>
+ </w:WordDocument>
+</xml><![endif]-->
+<style>
+<!--
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{mso-style-parent:"";
+	margin:0in;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+span.GramE
+	{mso-style-name:"";
+	mso-gram-e:yes;}
+@page Section1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.25in 1.0in 1.25in;
+	mso-header-margin:.5in;
+	mso-footer-margin:.5in;
+	mso-paper-source:0;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
+<!--[if gte mso 10]>
+<style>
+ /* Style Definitions */
+ table.MsoNormalTable
+	{mso-style-name:"Table Normal";
+	mso-tstyle-rowband-size:0;
+	mso-tstyle-colband-size:0;
+	mso-style-noshow:yes;
+	mso-style-parent:"";
+	mso-padding-alt:0in 5.4pt 0in 5.4pt;
+	mso-para-margin:0in;
+	mso-para-margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:10.0pt;
+	font-family:"Times New Roman";}
+</style>
+<![endif]-->
+</head>
+
+<body lang=EN-US style='tab-interval:.5in'>
+
+<div class=Section1>
+
+<p class=MsoNormal>Coursera Practical Machine Learning Final Project</p>
+
+<p class=MsoNormal><o:p>&nbsp;</o:p></p>
+
+<p class=MsoNormal>The goal of the project is to write a machine learning
+algorithm to predict the activity quality form the activity monitors. A look
+through the dataset shows there are five possible outcomes, labeled A-E. Because
+the goal is to assign a label to each case, a classification algorithm would be
+best since it assigns a factor as the outcome. A randomForest algorithm will be
+used since it will already assign a factor as the outcome. </p>
+
+<p class=MsoNormal><o:p>&nbsp;</o:p></p>
+
+<p class=MsoNormal>The data is available from two csv files, which consist of
+what I term the training data and the testing data. The training data contains
+over 19000 entry rows which will be used to train the fitting method and for
+validation purposes. The testing data contains the 20 entries which we want to
+accurately predict for the assignment.</p>
+
+<p class=MsoNormal><o:p>&nbsp;</o:p></p>
+
+<p class=MsoNormal>The dataset contains 159 possible predictors. This is a
+large number, and we want to prune predictors which have little or no
+correlation with the final result. Several columns in the dataset have a high number
+of entries which are empty (NA), which means they would have little effect on
+the fit since so many entries would be skipped. If a column in the training
+data has more than 80% NA entries, it is removed from the dataset. This removes
+nearly 70 columns from the dataset. Next, while the training dataset may have
+columns which have a large number of nonzero entries, the testing dataset still
+<span class=GramE>contains</span> columns which are completely empty (NA).
+Since these columns are empty in the testing dataset, they will not contribute
+to the final prediction, so it doesn’t make sense to include them in the
+training dataset. If a column is more than 80% empty in the testing dataset,
+the column is removed from the training and testing datasets. About 20 more
+columns are removed from the dataset.</p>
+
+<p class=MsoNormal><o:p>&nbsp;</o:p></p>
+
+<p class=MsoNormal>The goal of the project is to predict the outcome of the
+exercise based on the accelerometer data. The first seven columns contain no
+accelerometer data, so are not useful for the fit. These first seven columns
+are removed from the datasets. All remaining columns in the dataset are now
+predominantly nonempty and are all from the accelerometer.</p>
+
+<p class=MsoNormal><o:p>&nbsp;</o:p></p>
+
+<p class=MsoNormal>The training dataset is then divided into a training and
+validation datasets, which contain 80% and 20% of the original dataset,
+respectively. The new training data subset is used to train the data using the
+randomForest method using all remaining columns in the dataset. A fit is then
+done to the training dataset to get the in sample error, the validation set for
+the out of sample error, and on the training dataset to get the answers for the
+assignment. The in sample error is calculated to be 0% and the out of sample
+error to be .28%. <span class=GramE>This our</span> of sample error is small
+enough that I have a high probability of accurately predicting all 20 cases in
+the testing dataset. (An out of sample error of 5% would indicate that I have a
+high probability of only getting 19 of the 20 testing cases correct. Since the
+out of sample error is less than 1/10 of 5%, there is a high degree of
+confidence to get all 20 cases correct).</p>
+
+<p class=MsoNormal><o:p>&nbsp;</o:p></p>
+
+<p class=MsoNormal><o:p>&nbsp;</o:p></p>
+
+<p class=MsoNormal><o:p>&nbsp;</o:p></p>
+
+</div>
+
+</body>
+
+</html>
