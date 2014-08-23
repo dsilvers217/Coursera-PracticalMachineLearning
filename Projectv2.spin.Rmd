@@ -1,0 +1,143 @@
+
+```{r }
+set.seed(123)
+
+# Load up the train and test files. The test file is for the final submission, while the train file needs to serve as both training and cross-validation.
+data.train <- read.csv('/home/ben/Downloads/pml-training.csv', stringsAsFactors = FALSE)
+data.test  <- read.csv('/home/ben/Downloads/pml-testing.csv', stringsAsFactors = FALSE)
+
+
+# Get the dimensions of the data set. 
+print(dim(data.test))
+#There are 160 columns. This is a lot. Are there any which are always NA, or completely monotonic?
+
+
+#Go through each column and see if more than 80% of the column has no data in it. If so, then remove the column from the dataset.
+badColumns<-as.vector(80)
+count=1
+for (col in 1:length(data.train)) {
+
+  if (sum(is.na(data.train[[col]]))/length(data.train[[col]]) > 0.8) {
+    badColumns[count]<-col
+    count<-count+1
+  }
+
+}
+
+#Remove the columns with more than 80% NA entries from the training and testing dataset 
+data.train.subset<-subset(data.train[-badColumns])
+data.test.subset<-subset(data.test[-badColumns])
+
+
+#There are some columns in the testing dataset which have all NA entries. Since these entries are NA and will not give any useful info to the fit, it doesn't make sense to include these columns in the testing dataset. So look for any remaining columns in the testing dataset which are more than 80% empty.
+badColumns2<-as.vector(50)
+count<-1
+for (col in 1:length(data.test.subset)) {
+
+  if (sum(is.na(data.test.subset[[col]]))/length(data.test.subset[[col]]) > 0.8) {
+    badColumns2[count]<-col
+    count<-count+1
+  }
+
+}
+
+#Remove the columns selected above from the testing and training datasets.
+data.train.subset2<-subset(data.train.subset[-badColumns2])
+data.test.subset2<-subset(data.test.subset[-badColumns2])
+
+
+
+
+#The idea behind the study is to see if we can tell the type of lift performed based on data from the accelerometers. The first seven columns contain no accelerometer information, so they can be excluded from the datasets.
+firstCol <-1:7
+data.train.subset2 <- data.train.subset2[-firstCol]
+data.test.subset2  <- data.test.subset2[-firstCol]
+
+#Load the necessary libraries. Because we want to assign a classification as the outcome of the fit, we will use a randomForest algorithm for classification.
+library(caret)
+library(ggplot2)
+library(AppliedPredictiveModeling)
+library(randomForest)
+library(knitr)
+
+#Divide the training data in a training dataset and a validation dataset (80%/20% split)
+inTrain = createDataPartition(data.train.subset2$classe, p = 0.8)[[1]]
+data.train2 = data.train.subset2[inTrain, ]
+data.valid2 = data.train.subset2[-inTrain, ]
+
+# For the randomForest, we need to set the outcome as factors
+data.train2$classe <- as.factor(data.train2$classe)
+data.valid2$classe <- as.factor(data.valid2$classe)
+
+# Do the randomForest fit to the training data
+rfFit <- randomForest(classe ~ ., data = data.train2)
+
+# To get the in-sample error, predict the results using the training dataset used to make the fit
+rfPredIn <- predict(rfFit, newdata = data.train2)
+
+# Check the quality of the fit with the validation dataset
+rfPred <- predict(rfFit, newdata=data.valid2)
+
+#Apply the fit to the testing dataset
+rfPredTest <- predict(rfFit, newdata=data.test.subset2)
+
+# Add the predicted values to the training and validation dataset, to put all the data into one place.
+data.train2.pred <- data.frame(data.train2, rfPredIn)
+data.valid2.pred <- data.frame(data.valid2, rfPred)
+data.test.subset2 <- data.frame(data.test.subset2, rfPredTest)
+
+
+matchIn<-0
+noMatchIn<-0
+for (row in 1:dim(data.train2.pred)[1]) {
+  if (data.train2.pred$classe[row] == data.train2.pred$rfPred[row]) {
+    matchIn <- matchIn+1
+  }
+  else {
+    noMatchIn <- noMatchIn+1
+  }
+}
+
+# Out of sample error
+match<-0
+noMatch<-0
+for (row in 1:dim(data.valid2.pred)[1]) {
+  if (data.valid2.pred$classe[row] == data.valid2.pred$rfPred[row]) {
+    match <- match+1
+  }
+  else {
+    noMatch <- noMatch+1
+  }
+}
+
+# Print in sample error
+print("In Sample Error (%) = ")
+print(noMatchIn/(matchIn+noMatchIn)*100)
+
+# Print out of sample error
+print("Out of Sample Error (%) = ")
+print(noMatch/(match+noMatch)*100)
+
+# If these values are small (< 5%), then the odds are good that I will accurately predict all 20 classes.
+#Print the answers
+#print(data.test.subset2$rfPredTest)
+answers = data.test.subset2$rfPredTest
+answers = as.character(answers)
+
+pml_write_files = function(x) {
+  n = length(x)
+  for (i in 1:n) {
+    filename = paste0("problem_id_", i, ".txt")
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+  
+}
+pml_write_files(answers)
+```
+
+
+---
+title: "Projectv2.R"
+author: "ben"
+date: "Sat Aug 23 14:51:23 2014"
+---
